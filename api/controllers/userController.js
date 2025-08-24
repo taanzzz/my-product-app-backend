@@ -29,7 +29,8 @@ const registerUser = async (req, res) => {
       createdAt: new Date(),
     };
     await usersCollection.insertOne(newUser);
-    const verificationURL = `http://localhost:3000/verify-email?token=${emailVerificationToken}`;
+    const verificationURL = `${process.env.CLIENT_URL}/verify-email?token=${emailVerificationToken}`;
+    
     const message = `<p>Please verify your email by clicking on the following link:</p> <a href="${verificationURL}">${verificationURL}</a>`;
     await sendEmail({
       email: newUser.email,
