@@ -3,15 +3,15 @@ const cloudinary = require('../../config/cloudinary');
 
 const getProducts = async (req, res) => {
   try {
-    // URL থেকে search কোয়েরি প্যারামিটারটি নেওয়া হচ্ছে (e.g., /api/products?search=laptop)
+    
     const keyword = req.query.search 
       ? {
           name: {
-            $regex: req.query.search, // search টেক্সট দিয়ে প্রোডাক্টের নাম খোঁজা হচ্ছে
-            $options: 'i', // 'i' মানে case-insensitive (ছোট/বড় হাতের অক্ষর কোনো বিষয় না)
+            $regex: req.query.search, 
+            $options: 'i', 
           },
         }
-      : {}; // যদি কোনো search কোয়েরি না থাকে, তাহলে খালি অবজেক্ট
+      : {}; 
 
     const { productsCollection } = getCollections();
     const products = await productsCollection.find({ ...keyword }).toArray();
@@ -117,12 +117,12 @@ const updateProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // মালিকানা যাচাই করা হচ্ছে
+    
     if (product.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'User not authorized' });
     }
 
-    // আপডেটের জন্য ডেটা প্রস্তুত করা হচ্ছে
+    
     const updatedFields = {
       name: name || product.name,
       description: description || product.description,
@@ -131,18 +131,18 @@ const updateProduct = async (req, res) => {
       updatedAt: new Date(),
     };
 
-    // যদি নতুন ছবি আপলোড করা হয়
+    
     if (req.file) {
-      // Cloudinary থেকে পুরোনো ছবিটি ডিলিট করা হচ্ছে
+      
       if (product.imagePublicId) {
         await cloudinary.uploader.destroy(product.imagePublicId);
       }
-      // নতুন ছবির তথ্য যোগ করা হচ্ছে
+      
       updatedFields.imageUrl = req.file.path;
       updatedFields.imagePublicId = req.file.filename;
     }
 
-    // ডাটাবেসে প্রোডাক্ট আপডেট করা হচ্ছে
+    
     await productsCollection.updateOne(
       { _id: productId },
       { $set: updatedFields }
